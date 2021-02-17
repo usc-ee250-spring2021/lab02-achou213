@@ -4,35 +4,56 @@ List team members here.
 
 Insert Github repository link here.
 """
-
-"""python3 interpreters in Ubuntu (and other linux distros) will look in a 
-default set of directories for modules when a program tries to `import` one. 
-Examples of some default directories are (but not limited to):
-  /usr/lib/python3.5
-  /usr/local/lib/python3.5/dist-packages
-
-The `sys` module, however, is a builtin that is written in and compiled in C for
-performance. Because of this, you will not find this in the default directories.
-"""
 import sys
 import time
+import grovepi
+from grove_rgb_lcd import *
+
 # By appending the folder of all the GrovePi libraries to the system path here,
 # we are successfully `import grovepi`
 sys.path.append('../../Software/Python/')
 # This append is to support importing the LCD library.
 sys.path.append('../../Software/Python/grove_rgb_lcd')
 
-import grovepi
 
-"""This if-statement checks if you are running this python file directly. That 
-is, if you run `python3 grovepi_sensors.py` in terminal, this if-statement will 
-be true"""
-if __name__ == '__main__':
-    PORT = 4    # D4
+# Connect the Grove Ultrasonic Ranger to digital port D4
+# SIG,NC,VCC,GND
+ultrasonic_ranger = 4
+potentiometer = 0
+grovepi.pinMode(potentiometer,"INPUT")
+time.sleep(1)
 
-    while True:
-        #So we do not poll the sensors too quickly which may introduce noise,
-        #sleep for a reasonable time of 200ms between each iteration.
+# Full value of the rotary angle is 300 degrees, as per it's specs (0 to 300)
+full_angle = 300
+adc_ref = 5
+grove_vcc = 5
+count = 0
+while True:
+    
+
+    # Read angle value from potentiometer
+    sensor_value = grovepi.ultrasonicRead(ultrasonic_ranger)
+    sensor_value2 = grovepi.analogRead(potentiometer)
+    
+    if sensor_value2 >= 517:
+        sensor_value2 = 517
+        
+    if sensor_value < sensor_value2:
+        setRGB(255,0,0)
+        count = 1
+        setText_norefresh("{:.0f}".format(sensor_value2) + "cm" + " OBJ PRES" + "\n%dcm" %sensor_value)
+        time.sleep(0.5)
+        
+    elif (sensor_value > sensor_value2 & count == 1):
+        setRGB(0,255,0)
+        setText("{:.0f}".format(sensor_value2)+"cm\n%dcm" %sensor_value)
+        time.sleep(0.5)
+        count = 0
+        
+    else:
+        setRGB(0,255,0)
+        setText_norefresh("{:.0f}".format(sensor_value2)+"cm\n%dcm" %sensor_value)
         time.sleep(0.2)
+    # Read distance value from Ultrasonic
 
-        print(grovepi.ultrasonicRead(PORT))
+   
