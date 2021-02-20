@@ -3,6 +3,8 @@
 List team members here.
 
 Insert Github repository link here.
+Github repository link (with updated code): 
+https://github.com/usc-ee250-spring2021/lab02-achou213.git
 """
 import sys
 import time
